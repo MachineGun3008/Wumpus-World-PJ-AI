@@ -42,8 +42,8 @@ def create_map(filename):
     file.close()
     return gold, x, y, size, map
 
-
-gold, x, y, size, map = create_map('input.txt')
+map_list = ['Map\\map0.txt', 'Map\\map1.txt', 'Map\\map2.txt', 'Map\\map3.txt', 'Map\\map4.txt','Map\\map5.txt']
+gold, x, y, size, map = create_map('Map\\map5.txt')
 print(gold)
 global WIDTH, HEIGHT
 WIDTH = size * 75
@@ -186,8 +186,8 @@ def game(x, y, map, gold):
                 if map[col][row].find('A') != -1:
                     generate_object(model, player_x * 75 + 20, player_y * 75 + 20)
 
-        if map[player_x][player_y].find('W') != -1 or map[player_x][player_y].find('P') != -1:
-            running = False
+        # if map[player_x][player_y].find('W') != -1 or map[player_x][player_y].find('P') != -1:
+        #     running = False
 
 
         for event in pygame.event.get():
@@ -197,71 +197,254 @@ def game(x, y, map, gold):
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    print("Pressed")
                     if direction == 'left':
                         if map[player_x - 1][player_y].find('W') != -1:
                             wp_x = player_x - 1
                             wp_y = player_y
-                            oldstr = map[wp_x][wp_y]
-                            map[wp_x][wp_y] = oldstr.replace('W', '')
-                            path[wp_x][wp_y] = 1
 
-                            oldstr = map[wp_x + 1][wp_y]
-                            map[wp_x + 1][wp_y] = oldstr.replace('S', '')
-                            oldstr = map[wp_x][wp_y - 1]
-                            map[wp_x][wp_y - 1] = oldstr.replace('S', '')
-                            oldstr = map[wp_x - 1][wp_y]
-                            map[wp_x - 1][wp_y] = oldstr.replace('S', '')
-                            oldstr = map[wp_x][wp_y + 1]
-                            map[wp_x][wp_y + 1] = oldstr.replace('S', '')
+                            if wp_x == 0: #Wumpus at x axis
+                                oldstr = map[wp_x][wp_y]
+                                map[wp_x][wp_y] = oldstr.replace('W', '')
+                                path[wp_x][wp_y] = 1
+
+                                oldstr = map[wp_x + 1][wp_y] #Right of wumpus
+                                map[wp_x + 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y - 1] #Backward of wumpus
+                                map[wp_x][wp_y - 1] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y + 1] #Forward of wumpus
+                                map[wp_x][wp_y + 1] = oldstr.replace('S', '')
+                            elif wp_x == size - 1: #Wumpus at x border
+                                oldstr = map[wp_x][wp_y]
+                                map[wp_x][wp_y] = oldstr.replace('W', '')
+                                path[wp_x][wp_y] = 1
+
+                                oldstr = map[wp_x][wp_y - 1] #Backward of wumpus
+                                map[wp_x][wp_y - 1] = oldstr.replace('S', '')
+                                oldstr = map[wp_x - 1][wp_y] #Left of wumpus
+                                map[wp_x - 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y + 1] #Forward of wumpus
+                                map[wp_x][wp_y + 1] = oldstr.replace('S', '')
+                            elif wp_y == 0: #Wumpus at y axis
+                                oldstr = map[wp_x][wp_y]
+                                map[wp_x][wp_y] = oldstr.replace('W', '')
+                                path[wp_x][wp_y] = 1
+
+                                oldstr = map[wp_x + 1][wp_y] #Right of wumpus
+                                map[wp_x + 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x - 1][wp_y] #Left of wumpus
+                                map[wp_x - 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y + 1] #Forward of wumpus
+                                map[wp_x][wp_y + 1] = oldstr.replace('S', '')
+                            elif wp_y == size - 1: #Wumpus at y border
+                                oldstr = map[wp_x][wp_y]
+                                map[wp_x][wp_y] = oldstr.replace('W', '')
+                                path[wp_x][wp_y] = 1
+
+                                oldstr = map[wp_x + 1][wp_y] #Right of wumpus
+                                map[wp_x + 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y - 1] #Backward of wumpus
+                                map[wp_x][wp_y - 1] = oldstr.replace('S', '')
+                                oldstr = map[wp_x - 1][wp_y] #Left of wumpus
+                                map[wp_x - 1][wp_y] = oldstr.replace('S', '')
+                            else: #Wumpus not at axis or border
+                                oldstr = map[wp_x][wp_y]
+                                map[wp_x][wp_y] = oldstr.replace('W', '')
+                                path[wp_x][wp_y] = 1
+
+                                oldstr = map[wp_x - 1][wp_y] #Left of wumpus
+                                map[wp_x - 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x + 1][wp_y] #Right of wumpus
+                                map[wp_x + 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y - 1] #Backward of wumpus
+                                map[wp_x][wp_y - 1] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y + 1] #Forward of wumpus
+                                map[wp_x][wp_y + 1] = oldstr.replace('S', '')
                     if direction == 'right':
                         if map[player_x + 1][player_y].find('W') != -1:
                             wp_x = player_x + 1
                             wp_y = player_y
-                            oldstr = map[wp_x][wp_y]
-                            map[wp_x][wp_y] = oldstr.replace('W', '')
-                            path[wp_x][wp_y] = 1
 
-                            oldstr = map[wp_x + 1][wp_y]
-                            map[wp_x + 1][wp_y] = oldstr.replace('S', '')
-                            oldstr = map[wp_x][wp_y - 1]
-                            map[wp_x][wp_y - 1] = oldstr.replace('S', '')
-                            oldstr = map[wp_x - 1][wp_y]
-                            map[wp_x - 1][wp_y] = oldstr.replace('S', '')
-                            oldstr = map[wp_x][wp_y + 1]
-                            map[wp_x][wp_y + 1] = oldstr.replace('S', '')
+                            if wp_x == 0:  # Wumpus at x axis
+                                oldstr = map[wp_x][wp_y]
+                                map[wp_x][wp_y] = oldstr.replace('W', '')
+                                path[wp_x][wp_y] = 1
+
+                                oldstr = map[wp_x + 1][wp_y]  # Right of wumpus
+                                map[wp_x + 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y - 1]  # Backward of wumpus
+                                map[wp_x][wp_y - 1] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y + 1]  # Forward of wumpus
+                                map[wp_x][wp_y + 1] = oldstr.replace('S', '')
+                            elif wp_x == size - 1:  # Wumpus at x border
+                                oldstr = map[wp_x][wp_y]
+                                map[wp_x][wp_y] = oldstr.replace('W', '')
+                                path[wp_x][wp_y] = 1
+
+                                oldstr = map[wp_x][wp_y - 1]  # Backward of wumpus
+                                map[wp_x][wp_y - 1] = oldstr.replace('S', '')
+                                oldstr = map[wp_x - 1][wp_y]  # Left of wumpus
+                                map[wp_x - 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y + 1]  # Forward of wumpus
+                                map[wp_x][wp_y + 1] = oldstr.replace('S', '')
+                            elif wp_y == 0:  # Wumpus at y axis
+                                oldstr = map[wp_x][wp_y]
+                                map[wp_x][wp_y] = oldstr.replace('W', '')
+                                path[wp_x][wp_y] = 1
+
+                                oldstr = map[wp_x + 1][wp_y]  # Right of wumpus
+                                map[wp_x + 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x - 1][wp_y]  # Left of wumpus
+                                map[wp_x - 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y + 1]  # Forward of wumpus
+                                map[wp_x][wp_y + 1] = oldstr.replace('S', '')
+                            elif wp_y == size - 1:  # Wumpus at y border
+                                oldstr = map[wp_x][wp_y]
+                                map[wp_x][wp_y] = oldstr.replace('W', '')
+                                path[wp_x][wp_y] = 1
+
+                                oldstr = map[wp_x + 1][wp_y]  # Right of wumpus
+                                map[wp_x + 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y - 1]  # Backward of wumpus
+                                map[wp_x][wp_y - 1] = oldstr.replace('S', '')
+                                oldstr = map[wp_x - 1][wp_y]  # Left of wumpus
+                                map[wp_x - 1][wp_y] = oldstr.replace('S', '')
+                            else:  # Wumpus not at axis or border
+                                oldstr = map[wp_x][wp_y]
+                                map[wp_x][wp_y] = oldstr.replace('W', '')
+                                path[wp_x][wp_y] = 1
+
+                                oldstr = map[wp_x - 1][wp_y]  # Left of wumpus
+                                map[wp_x - 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x + 1][wp_y]  # Right of wumpus
+                                map[wp_x + 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y - 1]  # Backward of wumpus
+                                map[wp_x][wp_y - 1] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y + 1]  # Forward of wumpus
+                                map[wp_x][wp_y + 1] = oldstr.replace('S', '')
                     if direction == 'up':
                         if map[player_x][player_y - 1].find('W') != -1:
                             wp_x = player_x
                             wp_y = player_y - 1
-                            oldstr = map[wp_x][wp_y]
-                            map[wp_x][wp_y] = oldstr.replace('W', '')
-                            path[wp_x][wp_y] = 1
 
-                            oldstr = map[wp_x + 1][wp_y]
-                            map[wp_x + 1][wp_y] = oldstr.replace('S', '')
-                            oldstr = map[wp_x][wp_y - 1]
-                            map[wp_x][wp_y - 1] = oldstr.replace('S', '')
-                            oldstr = map[wp_x - 1][wp_y]
-                            map[wp_x - 1][wp_y] = oldstr.replace('S', '')
-                            oldstr = map[wp_x][wp_y + 1]
-                            map[wp_x][wp_y + 1] = oldstr.replace('S', '')
+                            if wp_x == 0:  # Wumpus at x axis
+                                oldstr = map[wp_x][wp_y]
+                                map[wp_x][wp_y] = oldstr.replace('W', '')
+                                path[wp_x][wp_y] = 1
+
+                                oldstr = map[wp_x + 1][wp_y]  # Right of wumpus
+                                map[wp_x + 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y - 1]  # Backward of wumpus
+                                map[wp_x][wp_y - 1] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y + 1]  # Forward of wumpus
+                                map[wp_x][wp_y + 1] = oldstr.replace('S', '')
+                            elif wp_x == size - 1:  # Wumpus at x border
+                                oldstr = map[wp_x][wp_y]
+                                map[wp_x][wp_y] = oldstr.replace('W', '')
+                                path[wp_x][wp_y] = 1
+
+                                oldstr = map[wp_x][wp_y - 1]  # Backward of wumpus
+                                map[wp_x][wp_y - 1] = oldstr.replace('S', '')
+                                oldstr = map[wp_x - 1][wp_y]  # Left of wumpus
+                                map[wp_x - 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y + 1]  # Forward of wumpus
+                                map[wp_x][wp_y + 1] = oldstr.replace('S', '')
+                            elif wp_y == 0:  # Wumpus at y axis
+                                oldstr = map[wp_x][wp_y]
+                                map[wp_x][wp_y] = oldstr.replace('W', '')
+                                path[wp_x][wp_y] = 1
+
+                                oldstr = map[wp_x + 1][wp_y]  # Right of wumpus
+                                map[wp_x + 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x - 1][wp_y]  # Left of wumpus
+                                map[wp_x - 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y + 1]  # Forward of wumpus
+                                map[wp_x][wp_y + 1] = oldstr.replace('S', '')
+                            elif wp_y == size - 1:  # Wumpus at y border
+                                oldstr = map[wp_x][wp_y]
+                                map[wp_x][wp_y] = oldstr.replace('W', '')
+                                path[wp_x][wp_y] = 1
+
+                                oldstr = map[wp_x + 1][wp_y]  # Right of wumpus
+                                map[wp_x + 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y - 1]  # Backward of wumpus
+                                map[wp_x][wp_y - 1] = oldstr.replace('S', '')
+                                oldstr = map[wp_x - 1][wp_y]  # Left of wumpus
+                                map[wp_x - 1][wp_y] = oldstr.replace('S', '')
+                            else:  # Wumpus not at axis or border
+                                oldstr = map[wp_x][wp_y]
+                                map[wp_x][wp_y] = oldstr.replace('W', '')
+                                path[wp_x][wp_y] = 1
+
+                                oldstr = map[wp_x - 1][wp_y]  # Left of wumpus
+                                map[wp_x - 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x + 1][wp_y]  # Right of wumpus
+                                map[wp_x + 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y - 1]  # Backward of wumpus
+                                map[wp_x][wp_y - 1] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y + 1]  # Forward of wumpus
+                                map[wp_x][wp_y + 1] = oldstr.replace('S', '')
                     if direction == 'down':
                         if map[player_x][player_y + 1].find('W') != -1:
                             wp_x = player_x
                             wp_y = player_y + 1
-                            oldstr = map[wp_x][wp_y]
-                            map[wp_x][wp_y] = oldstr.replace('W', '')
-                            path[wp_x][wp_y] = 1
 
-                            oldstr = map[wp_x + 1][wp_y]
-                            map[wp_x + 1][wp_y] = oldstr.replace('S', '')
-                            oldstr = map[wp_x][wp_y - 1]
-                            map[wp_x][wp_y - 1] = oldstr.replace('S', '')
-                            oldstr = map[wp_x - 1][wp_y]
-                            map[wp_x - 1][wp_y] = oldstr.replace('S', '')
-                            oldstr = map[wp_x][wp_y + 1]
-                            map[wp_x][wp_y + 1] = oldstr.replace('S', '')
+                            if wp_x == 0:  # Wumpus at x axis
+                                oldstr = map[wp_x][wp_y]
+                                map[wp_x][wp_y] = oldstr.replace('W', '')
+                                path[wp_x][wp_y] = 1
+
+                                oldstr = map[wp_x + 1][wp_y]  # Right of wumpus
+                                map[wp_x + 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y - 1]  # Backward of wumpus
+                                map[wp_x][wp_y - 1] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y + 1]  # Forward of wumpus
+                                map[wp_x][wp_y + 1] = oldstr.replace('S', '')
+                            elif wp_x == size - 1:  # Wumpus at x border
+                                oldstr = map[wp_x][wp_y]
+                                map[wp_x][wp_y] = oldstr.replace('W', '')
+                                path[wp_x][wp_y] = 1
+
+                                oldstr = map[wp_x][wp_y - 1]  # Backward of wumpus
+                                map[wp_x][wp_y - 1] = oldstr.replace('S', '')
+                                oldstr = map[wp_x - 1][wp_y]  # Left of wumpus
+                                map[wp_x - 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y + 1]  # Forward of wumpus
+                                map[wp_x][wp_y + 1] = oldstr.replace('S', '')
+                            elif wp_y == 0:  # Wumpus at y axis
+                                oldstr = map[wp_x][wp_y]
+                                map[wp_x][wp_y] = oldstr.replace('W', '')
+                                path[wp_x][wp_y] = 1
+
+                                oldstr = map[wp_x + 1][wp_y]  # Right of wumpus
+                                map[wp_x + 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x - 1][wp_y]  # Left of wumpus
+                                map[wp_x - 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y + 1]  # Forward of wumpus
+                                map[wp_x][wp_y + 1] = oldstr.replace('S', '')
+                            elif wp_y == size - 1:  # Wumpus at y border
+                                oldstr = map[wp_x][wp_y]
+                                map[wp_x][wp_y] = oldstr.replace('W', '')
+                                path[wp_x][wp_y] = 1
+
+                                oldstr = map[wp_x + 1][wp_y]  # Right of wumpus
+                                map[wp_x + 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y - 1]  # Backward of wumpus
+                                map[wp_x][wp_y - 1] = oldstr.replace('S', '')
+                                oldstr = map[wp_x - 1][wp_y]  # Left of wumpus
+                                map[wp_x - 1][wp_y] = oldstr.replace('S', '')
+                            else:  # Wumpus not at axis or border
+                                oldstr = map[wp_x][wp_y]
+                                map[wp_x][wp_y] = oldstr.replace('W', '')
+                                path[wp_x][wp_y] = 1
+
+                                oldstr = map[wp_x - 1][wp_y]  # Left of wumpus
+                                map[wp_x - 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x + 1][wp_y]  # Right of wumpus
+                                map[wp_x + 1][wp_y] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y - 1]  # Backward of wumpus
+                                map[wp_x][wp_y - 1] = oldstr.replace('S', '')
+                                oldstr = map[wp_x][wp_y + 1]  # Forward of wumpus
+                                map[wp_x][wp_y + 1] = oldstr.replace('S', '')
 
                 if event.key == pygame.K_RETURN:
                     if map[player_x][player_y].find('G') != -1:

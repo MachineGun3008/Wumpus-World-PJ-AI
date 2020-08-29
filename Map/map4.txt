@@ -1,0 +1,11 @@
+10
+P.B.-.B.B.P.B.-.G.G
+B.-.B.P.B.B.-.B.-.G
+-.B.-.B.-.-.B.P.B.-
+B.P.B.-.GS.S.-.B.B.-
+-.B.B.S.W.W.GS.B.P.B
+-.B.P.BS.W.W.S.B.B.B
+B.-.B.-.GS.S.B.P.B.P
+P.B.-.-.-.-.-.B.B.B
+B.-.B.-.-.-.-.B.P.B
+P.B.P.B.A.-.-.-.B.-
