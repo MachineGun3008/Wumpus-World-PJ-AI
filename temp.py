@@ -1,4 +1,5 @@
 import pygame
+import numpy as np
 import os
 import sys
 from pygame.locals import *
@@ -30,15 +31,20 @@ def create_map(filename):
     player = 'A'
     x = 0
     y = 0
+    gold = 0
     for i in range(len(map)):
         for j in range(len(map)):
+            if map[i][j] == 'G':
+                gold += 1
             if map[i][j] == player:
                 x = i
                 y = j
     file.close()
-    return (x, y, size, map)
+    return gold, x, y, size, map
 
-x, y, size, map = create_map('input.txt')
+
+gold, x, y, size, map = create_map('input.txt')
+print(gold)
 global WIDTH, HEIGHT
 WIDTH = size * 75
 HEIGHT = size * 75
@@ -46,19 +52,24 @@ HEIGHT = size * 75
 #Create title and logo
 screen = pygame.display.set_mode((WIDTH, HEIGHT), 0 )
 pygame.display.set_caption("Wumpus World")
-logo = pygame.image.load('wumpus.png')
+logo = pygame.image.load('wumpus_logo.png')
 pygame.display.set_icon(logo)
 
 #Object
-dirt = pygame.image.load('laval_blue.png')
-backgrounds = pygame.image.load('lava_black_d.png')
-
+fog = pygame.image.load('rock.png')
+floor = pygame.image.load('graybrick.png')
+# mark = pygame.image.load('cobblestone.png')
+wind = pygame.image.load('whirlwind.png')
+gold = pygame.image.load('gold.png')
+smell = pygame.image.load('stinksmell.png')
+wumpus = pygame.image.load('wumpus.png')
+hole = pygame.image.load('blackhole.png')
 
 #Player
-player_up = pygame.image.load('up.png')
-player_down = pygame.image.load('down.png')
-player_left = pygame.image.load('left.png')
-player_right = pygame.image.load('right.png')
+player_up = pygame.image.load('player_up.png')
+player_down = pygame.image.load('player_down.png')
+player_left = pygame.image.load('player_left.png')
+player_right = pygame.image.load('player_right.png')
 
 def draw_text(text, font, color, surface, x, y):
     textobj = font.render(text, 1, color)
@@ -135,24 +146,49 @@ def move_animation(command):
 def generate_object(obj_img, x, y):
     screen.blit(obj_img, (x, y))
 
-def game(x, y, map):
+def game(x, y, map, gold):
+    print(gold)
+    gold_collect = 0
     player_x = x
     player_y = y
-    model = player_right
+    model = player_down
+    direction = 0
+    path = np.zeros((size, size))
+
+
     running = True
     while running:
         pygame.time.delay(75)
 
         screen.fill(black)
-        screen.blit(backgrounds, (0,0))
 
+        pos_x = 0
+        pos_y = 0
         for col in range(size):
             for row in range(size):
-                if map[col][row] == map[player_x][player_y]:
-                    print(col, row)
-                    generate_object(model, player_x * 75 + 20, player_y * 75 + 20)
+                generate_object(floor, col * 75, row * 75)
+                if path[col][row] != 1 and map[col][row].find('A') == -1:
+                    generate_object(fog, col * 75, row * 75)
                 else:
-                    generate_object(dirt, col * 75, row * 75)
+                    # if path[col][row] == 1:
+                    #     generate_object(mark, col * 75, row * 75)
+                    if map[col][row].find('G') != -1:
+                        generate_object(gold, col * 75 + 20, row * 75 + 20)
+                    if map[col][row].find('B') != -1:
+                        generate_object(wind, col * 75 + 15, row * 75 + 10)
+                    if map[col][row].find('S') != -1:
+                        generate_object(smell, col * 75 + 40, row * 75 + 10)
+                    if map[col][row].find('W') != -1:
+                        generate_object(wumpus, col * 75 + 5, row * 75 + 5)
+                    if map[col][row].find('P') != -1:
+                        generate_object(hole, col * 75, row * 75)
+
+                if map[col][row].find('A') != -1:
+                    generate_object(model, player_x * 75 + 20, player_y * 75 + 20)
+
+        if map[player_x][player_y].find('W') != -1 or map[player_x][player_y].find('P') != -1:
+            running = False
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -160,33 +196,129 @@ def game(x, y, map):
                 sys.exit()
 
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT and player_x - 1 >= 0:
-                    model = player_left
-                    player_x -= 1
-                    map[player_x][player_y] = 'A'
-                    map[player_x + 1][player_y] = '-'
-                    print(player_x, player_y)
+                if event.key == pygame.K_SPACE:
+                    print("Pressed")
+                    if direction == 'left':
+                        if map[player_x - 1][player_y].find('W') != -1:
+                            wp_x = player_x - 1
+                            wp_y = player_y
+                            oldstr = map[wp_x][wp_y]
+                            map[wp_x][wp_y] = oldstr.replace('W', '')
+                            path[wp_x][wp_y] = 1
 
-                if event.key == pygame.K_RIGHT and player_x + 1 < size:
-                    model = player_right
-                    player_x += 1
-                    map[player_x][player_y] = 'A'
-                    map[player_x - 1][player_y] = '-'
-                    print(player_x, player_y)
+                            oldstr = map[wp_x + 1][wp_y]
+                            map[wp_x + 1][wp_y] = oldstr.replace('S', '')
+                            oldstr = map[wp_x][wp_y - 1]
+                            map[wp_x][wp_y - 1] = oldstr.replace('S', '')
+                            oldstr = map[wp_x - 1][wp_y]
+                            map[wp_x - 1][wp_y] = oldstr.replace('S', '')
+                            oldstr = map[wp_x][wp_y + 1]
+                            map[wp_x][wp_y + 1] = oldstr.replace('S', '')
+                    if direction == 'right':
+                        if map[player_x + 1][player_y].find('W') != -1:
+                            wp_x = player_x + 1
+                            wp_y = player_y
+                            oldstr = map[wp_x][wp_y]
+                            map[wp_x][wp_y] = oldstr.replace('W', '')
+                            path[wp_x][wp_y] = 1
 
-                if event.key == pygame.K_UP and player_y - 1 >= 0:
-                    model = player_up
-                    player_y -= 1
-                    map[player_x][player_y] = 'A'
-                    map[player_x][player_y + 1] = '-'
-                    print(player_x, player_y)
+                            oldstr = map[wp_x + 1][wp_y]
+                            map[wp_x + 1][wp_y] = oldstr.replace('S', '')
+                            oldstr = map[wp_x][wp_y - 1]
+                            map[wp_x][wp_y - 1] = oldstr.replace('S', '')
+                            oldstr = map[wp_x - 1][wp_y]
+                            map[wp_x - 1][wp_y] = oldstr.replace('S', '')
+                            oldstr = map[wp_x][wp_y + 1]
+                            map[wp_x][wp_y + 1] = oldstr.replace('S', '')
+                    if direction == 'up':
+                        if map[player_x][player_y - 1].find('W') != -1:
+                            wp_x = player_x
+                            wp_y = player_y - 1
+                            oldstr = map[wp_x][wp_y]
+                            map[wp_x][wp_y] = oldstr.replace('W', '')
+                            path[wp_x][wp_y] = 1
 
-                if event.key == pygame.K_DOWN and player_y + 1 < size:
-                    model = player_down
-                    player_y += 1
-                    map[player_x][player_y] = 'A'
-                    map[player_x][player_y - 1] = '-'
-                    print(player_x, player_y)
+                            oldstr = map[wp_x + 1][wp_y]
+                            map[wp_x + 1][wp_y] = oldstr.replace('S', '')
+                            oldstr = map[wp_x][wp_y - 1]
+                            map[wp_x][wp_y - 1] = oldstr.replace('S', '')
+                            oldstr = map[wp_x - 1][wp_y]
+                            map[wp_x - 1][wp_y] = oldstr.replace('S', '')
+                            oldstr = map[wp_x][wp_y + 1]
+                            map[wp_x][wp_y + 1] = oldstr.replace('S', '')
+                    if direction == 'down':
+                        if map[player_x][player_y + 1].find('W') != -1:
+                            wp_x = player_x
+                            wp_y = player_y + 1
+                            oldstr = map[wp_x][wp_y]
+                            map[wp_x][wp_y] = oldstr.replace('W', '')
+                            path[wp_x][wp_y] = 1
+
+                            oldstr = map[wp_x + 1][wp_y]
+                            map[wp_x + 1][wp_y] = oldstr.replace('S', '')
+                            oldstr = map[wp_x][wp_y - 1]
+                            map[wp_x][wp_y - 1] = oldstr.replace('S', '')
+                            oldstr = map[wp_x - 1][wp_y]
+                            map[wp_x - 1][wp_y] = oldstr.replace('S', '')
+                            oldstr = map[wp_x][wp_y + 1]
+                            map[wp_x][wp_y + 1] = oldstr.replace('S', '')
+
+                if event.key == pygame.K_RETURN:
+                    if map[player_x][player_y].find('G') != -1:
+                        gold_collect += 1
+                        print(gold_collect)
+                        oldstr = map[player_x][player_y]
+                        map[player_x][player_y] = oldstr.replace('G','')
+
+
+                if event.key == pygame.K_LEFT:
+                    if direction != 'left':
+                        model = player_left
+                        direction = 'left'
+                    else:
+                        if player_x - 1 >= 0:
+                            player_x -= 1
+                            map[player_x][player_y] += 'A'
+                            oldstr = map[player_x + 1][player_y]
+                            map[player_x + 1][player_y] = oldstr.replace('A', '')
+                            path[player_x + 1][player_y] = 1
+
+                if event.key == pygame.K_RIGHT:
+                    if direction != 'right':
+                        model = player_right
+                        direction = 'right'
+                    else:
+                        if player_x + 1 < size:
+                            player_x += 1
+                            map[player_x][player_y] += 'A'
+                            oldstr = map[player_x - 1][player_y]
+                            map[player_x - 1][player_y] = oldstr.replace('A', '')
+                            path[player_x - 1][player_y] = 1
+
+                if event.key == pygame.K_UP:
+                    if direction != 'up':
+                        model = player_up
+                        direction = 'up'
+                    else:
+                        if player_y - 1 >= 0:
+                            player_y -= 1
+                            map[player_x][player_y] += 'A'
+                            oldstr = map[player_x][player_y + 1]
+                            map[player_x][player_y + 1] = oldstr.replace('A', '')
+                            path[player_x][player_y + 1] = 1
+
+                if event.key == pygame.K_DOWN:
+                    if direction != 'down':
+                        model = player_down
+                        direction = 'down'
+                    else:
+                        if player_y + 1 < size:
+                            player_y += 1
+                            map[player_x][player_y] += 'A'
+                            oldstr = map[player_x][player_y - 1]
+                            map[player_x][player_y - 1] = oldstr.replace('A', '')
+                            path[player_x][player_y -1] = 1
+
 
         pygame.display.update()
         mainClock.tick(60)
@@ -194,4 +326,4 @@ def game(x, y, map):
 
 
 if __name__ == '__main__':
-    game(x, y, map)
+    game(x, y, map, gold)
