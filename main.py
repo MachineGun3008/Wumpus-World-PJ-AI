@@ -45,7 +45,7 @@ def create_map(filename):
     return gold, x, y, size, map
 
 
-gold, x, y, size, map = create_map('Map\\map2.txt')
+gold, x, y, size, map = create_map('Map\\map5.txt')
 print(gold)
 global WIDTH, HEIGHT
 WIDTH = size * 75
@@ -102,26 +102,6 @@ def game(x, y, map, gold):
 
         screen.fill(black)
 
-        for col in range(size):
-            for row in range(size):
-                if map[row][col].find('W') != -1:
-                    if row - 1 >= 0:
-                        map[row - 1][col] += 'S'
-                    if row + 1 < size:
-                        map[row + 1][col] += 'S'
-                    if col - 1 >= 0:
-                        map[row][col - 1] += 'S'
-                    if col + 1 < size:
-                        map[row][col + 1] += 'S'
-                if map[row][col].find('P') != -1:
-                    if row - 1 >= 0:
-                        map[row - 1][col] += 'B'
-                    if row + 1 < size:
-                        map[row + 1][col] += 'B'
-                    if col - 1 >= 0:
-                        map[row][col - 1] += 'B'
-                    if col + 1 < size:
-                        map[row][col + 1] += 'B'
 
         for col in range(size):
             for row in range(size):
@@ -307,6 +287,17 @@ def game(x, y, map, gold):
             pygame.quit()
             sys.exit()
         
+        for col in range(size):
+            for row in range(size):
+                if map[row][col].find('W') != -1:
+                    if row - 1 >= 0:
+                        map[row - 1][col] += 'S' if 'S' not in map[row - 1][col] else ''
+                    if row + 1 < size:
+                        map[row + 1][col] += 'S' if 'S' not in map[row + 1][col] else ''
+                    if col - 1 >= 0:
+                        map[row][col - 1] += 'S' if 'S' not in map[row][col - 1] else ''
+                    if col + 1 < size:
+                        map[row][col + 1] += 'S' if 'S' not in map[row][col + 1] else ''
         knight.SetMaze(map)
 
         pygame.display.update()
