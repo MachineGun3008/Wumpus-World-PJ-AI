@@ -9,6 +9,14 @@ from Agent import Agent
 pygame.init()
 mainClock = pygame.time.Clock()
 
+#Font
+font1 = pygame.font.Font('Spooky Cat Font.otf', 140)
+font2 = pygame.font.Font('Spooky Cat Font.otf', 100)
+font3 = pygame.font.Font('Spooky Cat Font.otf', 150)
+font4 = pygame.font.Font('Spooky Cat Font.otf', 90)
+font5 = pygame.font.Font('Spooky Cat Font.otf', 80)
+font6 = pygame.font.Font('Spooky Cat Font.otf', 190)
+
 #Color
 black = (0,0,0)
 white = (255,255,255)
@@ -44,28 +52,32 @@ def create_map(filename):
     file.close()
     return gold, x, y, size, map
 
+map_list = ['Map\\map0.txt', 'Map\\map1.txt', 'Map\\map2.txt', 'Map\\map3.txt', 'Map\\map4.txt', 'Map\\map5.txt']
+gold, x, y, size, map = create_map(map_list[np.random.randint(0,5)])
 
-gold, x, y, size, map = create_map('Map\\map5.txt')
-print(gold)
 global WIDTH, HEIGHT
-WIDTH = size * 75
+WIDTH = size * 75 + 550
 HEIGHT = size * 75
 
+
 #Create title and logo
-screen = pygame.display.set_mode((WIDTH, HEIGHT), 0 )
+screen = pygame.display.set_mode((WIDTH, HEIGHT), 0)
 pygame.display.set_caption("Wumpus World")
 logo = pygame.image.load('wumpus_logo.png')
 pygame.display.set_icon(logo)
+pygame.display.flip()
 
 #Object
 fog = pygame.image.load('rock.png')
 floor = pygame.image.load('graybrick.png')
-# mark = pygame.image.load('cobblestone.png')
 wind = pygame.image.load('whirlwind.png')
 gold = pygame.image.load('gold.png')
 smell = pygame.image.load('stinksmell.png')
 wumpus = pygame.image.load('wumpus.png')
 hole = pygame.image.load('blackhole.png')
+wumpus_big = pygame.image.load('wumpus_bigsize.png')
+background = pygame.image.load('cave.png')
+entrance1 = pygame.image.load('entrance.png')
 
 #Player
 player_up = pygame.image.load('player_up.png')
@@ -86,8 +98,9 @@ def generate_object(obj_img, x, y):
     screen.blit(obj_img, (x, y))
 
 def game(x, y, map, gold):
-    print(gold)
     gold_collect = 0
+    wumpus_kill = 0
+    score = 0
     player_x = x # Column
     player_y = y # Row
     model = player_right
@@ -101,16 +114,22 @@ def game(x, y, map, gold):
         pygame.time.delay(50)
 
         screen.fill(black)
-
-
+        screen.blit(background, (0,0))
+        draw_text("Hunt", font1, lemon, screen, size * 75 + 70, size - 10)
+        draw_text("the", font2, lemon, screen, size * 75 + 100, size + 100)
+        draw_text("WUMPUS", font3, red_ferrari, screen, size * 75 + 20, size + 170)
+        draw_text("Score:", font4, lemon, screen, size * 75 + 70, size + 400)
+        draw_text(str(score), font5, black, screen, size * 75 + 290, size + 410)
+        generate_object(wumpus_big, size * 75 + 320, size)
+        
         for col in range(size):
             for row in range(size):
                 generate_object(floor, col * 75, row * 75)
+                generate_object(entrance1, x * 75, y * 75)
+
                 if path[row][col] != 1 and map[row][col].find('A') == -1:
                     generate_object(fog, col * 75, row * 75)
                 else:
-                    # if path[col][row] == 1:
-                    #     generate_object(mark, col * 75, row * 75)
                     if map[row][col].find('G') != -1:
                         generate_object(gold, col * 75 + 20, row * 75 + 20)
                     if map[row][col].find('B') != -1:
@@ -126,7 +145,8 @@ def game(x, y, map, gold):
                     generate_object(model, player_x * 75 + 20, player_y * 75 + 20)
 
         if map[player_y][player_x].find('W') != -1 or map[player_y][player_x].find('P') != -1:
-            running = False
+            score -= 10000
+            game_over(wumpus_kill, gold_collect, score)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -149,6 +169,7 @@ def game(x, y, map, gold):
                 elif command == 'DOWN':
                     model = player_down
         if command == 'GO':
+            score -= 10
             if direction == 'LEFT':
                 if player_x - 1 >= 0:
                     player_x -= 1
@@ -180,6 +201,7 @@ def game(x, y, map, gold):
             knight.SetNewRoom((player_y, player_x))
             
         elif command == 'SHOT':
+            score -= 100
             wp_x, wp_y = -1, -1
             if direction == 'LEFT':
                 if map[player_y][player_x - 1].find('W') != -1:
@@ -205,6 +227,7 @@ def game(x, y, map, gold):
                         oldstr = map[wp_y][wp_x + 1]
                         map[wp_y][wp_x + 1] = oldstr.replace('S', '-')
                     knight.SetNewRoom((wp_y, wp_x))
+                    wumpus_kill += 1
             elif direction == 'RIGHT':
                 if map[player_y][player_x + 1].find('W') != -1:
                     wp_x = player_x + 1
@@ -229,6 +252,7 @@ def game(x, y, map, gold):
                         oldstr = map[wp_y][wp_x + 1]
                         map[wp_y][wp_x + 1] = oldstr.replace('S', '-')
                     knight.SetNewRoom((wp_y, wp_x))
+                    wumpus_kill += 1
             elif direction == 'UP':
                 if map[player_y - 1][player_x].find('W') != -1:
                     wp_x = player_x
@@ -253,6 +277,7 @@ def game(x, y, map, gold):
                         oldstr = map[wp_y][wp_x + 1]
                         map[wp_y][wp_x + 1] = oldstr.replace('S', '-')
                     knight.SetNewRoom((wp_y, wp_x))
+                    wumpus_kill += 1
             elif direction == 'DOWN':
                 if map[player_y + 1][player_x].find('W') != -1:
                     wp_x = player_x
@@ -277,15 +302,18 @@ def game(x, y, map, gold):
                         oldstr = map[wp_y][wp_x + 1]
                         map[wp_y][wp_x + 1] = oldstr.replace('S', '-')
                     knight.SetNewRoom((wp_y, wp_x))
+                    wumpus_kill += 1
         elif command == 'TAKE GOLD':
             if map[player_y][player_x].find('G') != -1:
+                score += 100
                 gold_collect += 1
-                print(gold_collect)
                 oldstr = map[player_y][player_x]
                 map[player_y][player_x] = oldstr.replace('G','-')
         elif command == 'CLIMB UP':
-            pygame.quit()
-            sys.exit()
+            score += 10
+            draw_text("You won!", font1, red_ferrari, screen, size * 75 + 70, size + 500)
+            game_over(wumpus_kill, gold_collect, score)
+
         
         for col in range(size):
             for row in range(size):
@@ -304,7 +332,43 @@ def game(x, y, map, gold):
         mainClock.tick(240)
         time.sleep(0.01)
 
+click = False
 
+def game_over(n_wumpus_kill, n_gold_collect, score):
+    while True:
+        screen.fill(black)
+
+
+        quit = pygame.Rect(size + 540, size + 550, 220, 120)
+        pygame.draw.rect(screen, black, quit)
+        screen.blit(background, (0,0))
+
+        draw_text("GAMEOVER!", font6, red_ferrari, screen, size + 270, size)
+        draw_text("Score:", font4, lemon, screen, size + 500, size + 200)
+        draw_text(str(score), font5, black, screen, size + 700, size + 210)
+        draw_text("Golds collected:", font4, lemon, screen, size + 400, size + 300)
+        draw_text(str(n_gold_collect), font5, black, screen, size+ 910, size + 315)
+        draw_text("Wumpuses killed:", font4, lemon, screen, size + 375, size + 400)
+        draw_text(str(n_wumpus_kill), font5, black, screen, size + 940, size + 415)
+        draw_text("Quit", font1, white, screen, size + 550, size + 520)
+
+        click = False
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+
+        mx, my = pygame.mouse.get_pos()
+        if quit.collidepoint((mx,my)):
+            if click:
+                pygame.quit()
+                sys.exit()
+        pygame.display.update()
+        mainClock.tick(240)
 
 if __name__ == '__main__':
     game(x, y, map, gold)
