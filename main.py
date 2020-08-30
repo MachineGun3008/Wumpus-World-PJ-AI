@@ -45,7 +45,7 @@ def create_map(filename):
     return gold, x, y, size, map
 
 
-gold, x, y, size, map = create_map('input.txt')
+gold, x, y, size, map = create_map('Map\\map0.txt')
 print(gold)
 global WIDTH, HEIGHT
 WIDTH = size * 75
@@ -98,12 +98,10 @@ def game(x, y, map, gold):
 
     running = True
     while running:
-        pygame.time.delay(75)
+        pygame.time.delay(100)
 
         screen.fill(black)
 
-        pos_x = 0
-        pos_y = 0
         for col in range(size):
             for row in range(size):
                 generate_object(floor, col * 75, row * 75)
@@ -135,8 +133,6 @@ def game(x, y, map, gold):
                 pygame.quit()
                 sys.exit()
 
-        if player_x == 0 and player_y == 7:
-            print('test')
         command = knight.GetActions()            
 
         if command == 'LEFT' or command == 'RIGHT' or command == 'DOWN' or command == 'UP':
@@ -146,7 +142,7 @@ def game(x, y, map, gold):
                 direction = command
                 if command == 'LEFT':
                     model = player_left
-                elif command == 'Right':
+                elif command == 'RIGHT':
                     model = player_right
                 elif command == 'UP':
                     model = player_up
@@ -192,15 +188,22 @@ def game(x, y, map, gold):
                     oldstr = map[wp_y][wp_x]
                     map[wp_y][wp_x] = oldstr.replace('W', '-')
                     path[wp_y][wp_x] = 1
-
-                    oldstr = map[wp_y][wp_x + 1]
-                    map[wp_y][wp_x + 1] = oldstr.replace('S', '-')
-                    oldstr = map[wp_y - 1][wp_x]
-                    map[wp_y - 1][wp_x] = oldstr.replace('S', '-')
-                    oldstr = map[wp_y][wp_x - 1]
-                    map[wp_y][wp_x - 1] = oldstr.replace('S', '-')
-                    oldstr = map[wp_y + 1][wp_x]
-                    map[wp_y + 1][wp_x] = oldstr.replace('S', '-')
+                    if wp_y - 1 >= 0:
+                        # Wumpus's left cell
+                        oldstr = map[wp_y - 1][wp_x]
+                        map[wp_y - 1][wp_x] = oldstr.replace('S', '-')
+                    if wp_y + 1 < size:
+                        # Wumpus's right cell
+                        oldstr = map[wp_y + 1][wp_x]
+                        map[wp_y + 1][wp_x] = oldstr.replace('S', '-')
+                    if wp_x - 1 >= 0:
+                        # Wumpus's upper cell
+                        oldstr = map[wp_y][wp_x - 1]
+                        map[wp_y][wp_x - 1] = oldstr.replace('S', '-')
+                    if wp_x + 1 < size:
+                        # Wumpus's lower cell
+                        oldstr = map[wp_y][wp_x + 1]
+                        map[wp_y][wp_x + 1] = oldstr.replace('S', '-')
                     knight.SetNewRoom((wp_y, wp_x))
             elif direction == 'RIGHT':
                 if map[player_y + 1][player_x].find('W') != -1:
@@ -209,49 +212,70 @@ def game(x, y, map, gold):
                     oldstr = map[wp_y][wp_x]
                     map[wp_y][wp_x] = oldstr.replace('W', '-')
                     path[wp_y][wp_x] = 1
-
-                    oldstr = map[wp_y][wp_x + 1]
-                    map[wp_y][wp_x + 1] = oldstr.replace('S', '-')
-                    oldstr = map[wp_y - 1][wp_x]
-                    map[wp_y - 1][wp_x] = oldstr.replace('S', '-')
-                    oldstr = map[wp_y][wp_x - 1]
-                    map[wp_y][wp_x - 1] = oldstr.replace('S', '-')
-                    oldstr = map[wp_y + 1][wp_x]
-                    map[wp_y + 1][wp_x] = oldstr.replace('S', '-')
+                    if wp_y - 1 >= 0:
+                        # Wumpus's left cell
+                        oldstr = map[wp_y - 1][wp_x]
+                        map[wp_y - 1][wp_x] = oldstr.replace('S', '-')
+                    if wp_y + 1 < size:
+                        # Wumpus's right cell
+                        oldstr = map[wp_y + 1][wp_x]
+                        map[wp_y + 1][wp_x] = oldstr.replace('S', '-')
+                    if wp_x - 1 >= 0:
+                        # Wumpus's upper cell
+                        oldstr = map[wp_y][wp_x - 1]
+                        map[wp_y][wp_x - 1] = oldstr.replace('S', '-')
+                    if wp_x + 1 < size:
+                        # Wumpus's lower cell
+                        oldstr = map[wp_y][wp_x + 1]
+                        map[wp_y][wp_x + 1] = oldstr.replace('S', '-')
                     knight.SetNewRoom((wp_y, wp_x))
             elif direction == 'UP':
                 if map[player_y - 1][player_x].find('W') != -1:
                     wp_x = player_x
                     wp_y = player_y - 1
-                    oldstr = map[wp_x][wp_y]
+                    oldstr = map[wp_y][wp_x]
                     map[wp_y][wp_x] = oldstr.replace('W', '-')
                     path[wp_y][wp_x] = 1
-
-                    oldstr = map[wp_y][wp_x + 1]
-                    map[wp_y][wp_x + 1] = oldstr.replace('S', '-')
-                    oldstr = map[wp_y - 1][wp_x]
-                    map[wp_y - 1][wp_x] = oldstr.replace('S', '-')
-                    oldstr = map[wp_y][wp_x - 1]
-                    map[wp_y][wp_x - 1] = oldstr.replace('S', '-')
-                    oldstr = map[wp_y + 1][wp_x]
-                    map[wp_y + 1][wp_x] = oldstr.replace('S', '-')
+                    if wp_y - 1 >= 0:
+                        # Wumpus's left cell
+                        oldstr = map[wp_y - 1][wp_x]
+                        map[wp_y - 1][wp_x] = oldstr.replace('S', '-')
+                    if wp_y + 1 < size:
+                        # Wumpus's right cell
+                        oldstr = map[wp_y + 1][wp_x]
+                        map[wp_y + 1][wp_x] = oldstr.replace('S', '-')
+                    if wp_x - 1 >= 0:
+                        # Wumpus's upper cell
+                        oldstr = map[wp_y][wp_x - 1]
+                        map[wp_y][wp_x - 1] = oldstr.replace('S', '-')
+                    if wp_x + 1 < size:
+                        # Wumpus's lower cell
+                        oldstr = map[wp_y][wp_x + 1]
+                        map[wp_y][wp_x + 1] = oldstr.replace('S', '-')
                     knight.SetNewRoom((wp_y, wp_x))
             elif direction == 'DOWN':
                 if map[player_y + 1][player_x].find('W') != -1:
                     wp_x = player_x
                     wp_y = player_y + 1
-                    oldstr = map[wp_x][wp_y]
+                    oldstr = map[wp_y][wp_x]
                     map[wp_y][wp_x] = oldstr.replace('W', '-')
                     path[wp_y][wp_x] = 1
-
-                    oldstr = map[wp_y][wp_x + 1]
-                    map[wp_y][wp_x + 1] = oldstr.replace('S', '-')
-                    oldstr = map[wp_y - 1][wp_x]
-                    map[wp_y - 1][wp_x] = oldstr.replace('S', '-')
-                    oldstr = map[wp_y][wp_x - 1]
-                    map[wp_y][wp_x - 1] = oldstr.replace('S', '-')
-                    oldstr = map[wp_y + 1][wp_x]
-                    map[wp_y + 1][wp_x] = oldstr.replace('S', '-')
+                    if wp_y - 1 >= 0:
+                        # Wumpus's left cell
+                        oldstr = map[wp_y - 1][wp_x]
+                        map[wp_y - 1][wp_x] = oldstr.replace('S', '-')
+                    if wp_y + 1 < size:
+                        # Wumpus's right cell
+                        oldstr = map[wp_y + 1][wp_x]
+                        map[wp_y + 1][wp_x] = oldstr.replace('S', '-')
+                    if wp_x - 1 >= 0:
+                        # Wumpus's upper cell
+                        oldstr = map[wp_y][wp_x - 1]
+                        map[wp_y][wp_x - 1] = oldstr.replace('S', '-')
+                    if wp_x + 1 < size:
+                        # Wumpus's lower cell
+                        oldstr = map[wp_y][wp_x + 1]
+                        map[wp_y][wp_x + 1] = oldstr.replace('S', '-')
                     knight.SetNewRoom((wp_y, wp_x))
         elif command == 'TAKE GOLD':
             if map[player_y][player_x].find('G') != -1:
