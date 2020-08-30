@@ -88,8 +88,8 @@ def generate_object(obj_img, x, y):
 def game(x, y, map, gold):
     print(gold)
     gold_collect = 0
-    player_x = x
-    player_y = y
+    player_x = x # Column
+    player_y = y # Row
     model = player_right
     direction = 'RIGHT'
     path = np.zeros((size, size))
@@ -98,9 +98,30 @@ def game(x, y, map, gold):
 
     running = True
     while running:
-        pygame.time.delay(100)
+        pygame.time.delay(50)
 
         screen.fill(black)
+
+        for col in range(size):
+            for row in range(size):
+                if map[row][col].find('W') != -1:
+                    if row - 1 >= 0:
+                        map[row - 1][col] += 'S'
+                    if row + 1 < size:
+                        map[row + 1][col] += 'S'
+                    if col - 1 >= 0:
+                        map[row][col - 1] += 'S'
+                    if col + 1 < size:
+                        map[row][col + 1] += 'S'
+                if map[row][col].find('P') != -1:
+                    if row - 1 >= 0:
+                        map[row - 1][col] += 'B'
+                    if row + 1 < size:
+                        map[row + 1][col] += 'B'
+                    if col - 1 >= 0:
+                        map[row][col - 1] += 'B'
+                    if col + 1 < size:
+                        map[row][col + 1] += 'B'
 
         for col in range(size):
             for row in range(size):
@@ -126,7 +147,6 @@ def game(x, y, map, gold):
 
         if map[player_y][player_x].find('W') != -1 or map[player_y][player_x].find('P') != -1:
             running = False
-
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -206,7 +226,7 @@ def game(x, y, map, gold):
                         map[wp_y][wp_x + 1] = oldstr.replace('S', '-')
                     knight.SetNewRoom((wp_y, wp_x))
             elif direction == 'RIGHT':
-                if map[player_y + 1][player_x].find('W') != -1:
+                if map[player_y][player_x + 1].find('W') != -1:
                     wp_x = player_x + 1
                     wp_y = player_y
                     oldstr = map[wp_y][wp_x]
