@@ -45,7 +45,7 @@ def create_map(filename):
     return gold, x, y, size, map
 
 
-gold, x, y, size, map = create_map('Map\\map0.txt')
+gold, x, y, size, map = create_map('Map\\map2.txt')
 print(gold)
 global WIDTH, HEIGHT
 WIDTH = size * 75

@@ -130,7 +130,6 @@ class Agent:
         # For every x, y: Not PIT(x, y) Or Not Unknown(x, y) Or Not Exist Room(x, y - 1) Or Unknown Room(x, y - 1) Or Breeze Room(x, y - 1) From KB
         # For every x,y : Not PIT(x, y) Or Not Unknown(x, y) Or Not Exist Room(x, y + 1) Or Unknown Room(x, y + 1) Or Breeze Room(x, y +  1) From KB
         # Not PIT(postion) Negation
-
         if self.CheckUnknown(position) == False:
             return False
         for i in range(4):
@@ -141,6 +140,8 @@ class Agent:
 
     def CheckWumpus(self, position):
         # Check in KB, has Agent already known that room doesn't have wumpus
+        if self.CheckExist(position) == False:
+            return False
         if not self.wumpus[position[0]][position[1]]:
             return False
 
