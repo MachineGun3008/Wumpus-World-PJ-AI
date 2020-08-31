@@ -6,6 +6,6 @@ S.WB.P.B.P.B.B.P.B.-
 -.S.W.BS.P.B.-.B.-.-
 -.-.S.-.B.S.B.P.B.-
 -.S.W.S.S.W.S.B.-.S
-A-.-.S.-.-.S.-.-.S.W
+A.-.S.-.-.S.-.-.S.W
 B.BS.W.S.B.-.-.S.G.S
 P.P.BS.B.P.B.S.W.GS.G

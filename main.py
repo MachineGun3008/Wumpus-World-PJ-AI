@@ -49,6 +49,7 @@ def create_map(filename):
             if player in map[i][j]:
                 y = i
                 x = j
+                map[i][j] += '-'
     file.close()
     return gold, x, y, size, map
 
@@ -328,9 +329,15 @@ def game(x, y, map, gold):
                         map[row][col + 1] += 'S' if 'S' not in map[row][col + 1] else ''
         knight.SetMaze(map)
 
+        # Print KB
+        print('---------------------------------------')
+        print(command)
+        knight.PrintKB()
+        print('Score: {0}'.format(score))
+
         pygame.display.update()
         mainClock.tick(240)
-        time.sleep(0.01)
+        time.sleep(2)
 
 click = False
 

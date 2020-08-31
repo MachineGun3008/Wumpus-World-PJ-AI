@@ -48,39 +48,32 @@ class Agent:
 
     
     def PrintKB(self):
-        KB = []
         for i in range(self.height):
             for j in range(self.width):
-                literals = []
-                if self.empty_room in self.maze[i][j]:
-                    literals.append('Empty room ({0}, {1})'.format(i, j))
+                if self.maze[i][j] == '':
+                    print('Unknown({0}, {1})'.format(10 - i, j + 1))
                 if self.breeze in self.maze[i][j]:
-                    literals.append('Breeze room ({0}, {1})'.format(i, j))
+                    print('Breeze room({0}, {1})'.format(10 - i, j))
                 if self.stench in self.maze[i][j]:
-                    literals.append('Stench room ({0}, {1})'.format(i, j))
+                    print('Stench room({0}, {1})'.format(10 - i, j))
                 if self.wumpus[i][j] == 0:
-                    literals.append('Not Wumpus({0}, {1})'.format(i, j))
-                clause = ''
-                for u in range(len(literals), -1, -1):
-                    clause += literals[u]
-                    if u:
-                        clause += ' Or '
-                KB.append(clause)
+                    print('Not Wumpus({0}, {1})'.format(10 - i, j))
         
         print('For every x, y: Not Exist(x, y) Or Wumpus(x, y) Or PIT(x, y) Or Safe(x, y)')
-        print('For every x, y: Not (0 <= x < 10) Or Not (0 <= y < 10) Or Exist(x, y)')
-        print('For every x, y: Not Wumpus(x, y) Or Not Unknown(x, y) Or Not Exist Room(x - 1, y) Or Unknown Room(x - 1, y) Or Stench Room(x - 1, y)')
-        print('For every x, y: Not Wumpus(x, y) Or Not Unknown(x, y) Or Not Exist Room(x + 1, y) Or Unknown Room(x + 1, y) Or Stench Room(x + 1, y)')
-        print('For every x, y: Not Wumpus(x, y) Or Not Unknown(x, y) Or Not Exist Room(x, y - 1) Or Unknown Room(x, y - 1) Or Stench Room(x, y - 1)')
-        print('For every x, y: Not Wumpus(x, y) Or Not Unknown(x, y) Or Not Exist Room(x, y + 1) Or Unknown Room(x, y + 1) Or Stench Room(x, y + 1)')
-        print('For every x, y: Not PIT(x, y) Or Not Unknown(x, y) Or Not Exist Room(x - 1, y) Or Unknown Room(x - 1, y) Or Breeze Room(x - 1, y)')
-        print('For every x, y: Not PIT(x, y) Or Not Unknown(x, y) Or Not Exist Room(x + 1, y) Or Unknown Room(x + 1, y) Or Breeze Room(x + 1, y)')
-        print('For every x, y: Not PIT(x, y) Or Not Unknown(x, y) Or Not Exist Room(x, y - 1) Or Unknown Room(x, y - 1) Or Breeze Room(x, y - 1)')
-        print('For every x,y : Not PIT(x, y) Or Not Unknown(x, y) Or Not Exist Room(x, y + 1) Or Unknown Room(x, y + 1) Or Breeze Room(x, y +  1)')
+        print('For every x, y: Not (1 <= x <= 10) Or Not (1 <= y <= 10) Or Exist(x, y)')
+        print('For every x, y: Wumpus(x, y) => Exist(x, y)')
+        print('For every x, y: Wumpus(X, y) => Unknown(x, y)')
+        print('For every x, y: Wumpus(x, y) => Not Exist Room(x - 1, y) Or Unknown Room(x - 1, y) Or Stench Room(x - 1, y)')
+        print('For every x, y: Wumpus(x, y) => Not Exist Room(x + 1, y) Or Unknown Room(x + 1, y) Or Stench Room(x + 1, y)')
+        print('For every x, y: Wumpus(x, y) => Not Exist Room(x, y - 1) Or Unknown Room(x, y - 1) Or Stench Room(x, y - 1)')
+        print('For every x, y: Wumpus(x, y) => Not Exist Room(x, y + 1) Or Unknown Room(x, y + 1) Or Stench Room(x, y + 1)')
+        print('For every x, y: PIT(x, y) => Exist(x, y)')
+        print('For every x, y: PIT(x, y) => Unknown(x, y)')
+        print('For every x, y: PIT(x, y) => Not Exist Room(x - 1, y) Or Unknown Room(x - 1, y) Or Breeze Room(x - 1, y)')
+        print('For every x, y: PIT(x, y) => Not Exist Room(x + 1, y) Or Unknown Room(x + 1, y) Or Breeze Room(x + 1, y)')
+        print('For every x, y: PIT(x, y) => Not Exist Room(x, y - 1) Or Unknown Room(x, y - 1) Or Breeze Room(x, y - 1)')
+        print('For every x,y : PIT(x, y) => Not Exist Room(x, y + 1) Or Unknown Room(x, y + 1) Or Breeze Room(x, y +  1)')
        
-        for i in range(len(KB)):
-            print(KB[i], end = '')
-            print()
     
     # When Agent reach new room, it has to expand its KB
     def SetMaze(self, map):
@@ -145,12 +138,12 @@ class Agent:
         if not self.wumpus[position[0]][position[1]]:
             return False
 
-        # Use 4 first logic order in KB and resolution
-        # For every x, y: Not Wumpus(x, y) Or Not Unknown(x, y) Or Not Exist Room(x - 1, y) Or Unknown Room(x - 1, y) Or Stench Room(x - 1, y) From KN
-        # For every x, y: Not Wumpus(x, y) Or Not Unknown(x, y) Or Not Exist Room(x + 1, y) Or Unknown Room(x + 1, y) Or Stench Room(x + 1, y) From KB
-        # For every x, y: Not Wumpus(x, y) Or Not Unknown(x, y) Or Not Exist Room(x, y - 1) Or Unknown Room(x, y - 1) Or Stench Room(x, y - 1) From KB
-        # For every x, y: Not Wumpus(x, y) Or Not Unknown(x, y) Or Not Exist Room(x, y + 1) Or Unknown Room(x, y + 1) Or Stench Room(x, y + 1) From KB
-        # Not Wumpus(position) Negation
+        # Use 4 first logic order in KB
+        # For every x, y: (Wumpus(x, y) And Unknown(x, y)) => Not Exist Room(x - 1, y) Or Unknown Room(x - 1, y) Or Stench Room(x - 1, y) From KN
+        # For every x, y: (Wumpus(x, y) And Unknown(x, y)) => Not Exist Room(x + 1, y) Or Unknown Room(x + 1, y) Or Stench Room(x + 1, y) From KB
+        # For every x, y: (Wumpus(x, y) And Unknown(x, y)) => Not Exist Room(x, y - 1) Or Unknown Room(x, y - 1) Or Stench Room(x, y - 1) From KB
+        # For every x, y: (Wumpus(x, y) And Unknown(x, y)) => Not Exist Room(x, y + 1) Or Unknown Room(x, y + 1) Or Stench Room(x, y + 1) From KB
+        # Wumpus(position)
         if self.CheckUnknown(position) == False:
             return False
         for i in range(4):
@@ -260,8 +253,6 @@ class Agent:
                     if self.maze[new_position[0]][new_position[1]] != '':
                         q.put(new_position)
                     count[1] += 1
-                    if new_position == (1, 3):
-                        print('test')
                     if self.maze[new_position[0]][new_position[1]] == '' and self.CheckWumpus(new_position):
                         new_price = (level + 1) * self.point_for_moving + self.point_for_shooting_arrow * self.CalProbility(new_position, 1)
                         if price < new_price:
@@ -285,8 +276,6 @@ class Agent:
             self.command.append('TAKE GOLD')
             return self.command[-1]
         # Find the safest path
-        if self.pos == (5, 0):
-            print('test')
         goal = self.FindPath()
         if goal != self.pos:
             self.FindPathWithGoal(goal)
